@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>議事録整理ツール</title>
+
+<style>
+body{
+font-family: sans-serif;
+margin:40px;
+background:#f4f4f4;
+}
+
+textarea{
+width:100%;
+height:200px;
+margin-bottom:20px;
+}
+
+button{
+padding:10px 20px;
+font-size:16px;
+cursor:pointer;
+}
+
+.result{
+background:white;
+padding:20px;
+margin-top:20px;
+border-radius:5px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>AI風 議事録整理ツール</h2>
+
+<p>会議メモを貼り付けてください</p>
+
+<textarea id="input"></textarea>
+
+<button onclick="organize()">議事録整理</button>
+
+<div class="result">
+<h3>整理結果</h3>
+<div id="output"></div>
+</div>
+
+<script>
+
+function organize(){
+
+let text = document.getElementById("input").value;
+
+let lines = text.split("\n");
+
+let tasks = [];
+let decisions = [];
+let topics = [];
+
+lines.forEach(line=>{
+
+if(line.includes("決定") || line.includes("やる") || line.includes("実施")){
+decisions.push(line);
+}
+
+if(line.includes("まで") || line.includes("担当") || line.includes("やる")){
+tasks.push(line);
+}
+
+topics.push(line);
+
+});
+
+let result = `
+<h4>議題</h4>
+<ul>${topics.map(l=>"<li>"+l+"</li>").join("")}</ul>
+
+<h4>決定事項</h4>
+<ul>${decisions.map(l=>"<li>"+l+"</li>").join("")}</ul>
+
+<h4>タスク候補</h4>
+<ul>${tasks.map(l=>"<li>"+l+"</li>").join("")}</ul>
+`;
+
+document.getElementById("output").innerHTML=result;
+
+}
+
+</script>
+
+</body>
+</html>
