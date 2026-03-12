@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>音声議事録ツール</title>
+
+<style>
+body{
+font-family:sans-serif;
+margin:40px;
+background:#f4f4f4;
+}
+
+button{
+padding:10px 20px;
+font-size:16px;
+margin-right:10px;
+}
+
+textarea{
+width:100%;
+height:150px;
+margin-top:20px;
+}
+
+.result{
+background:white;
+padding:20px;
+margin-top:20px;
+border-radius:5px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>音声 → 議事録整理ツール</h2>
+
+<button onclick="startRec()">録音開始</button>
+<button onclick="stopRec()">録音停止</button>
+
+<textarea id="memo" placeholder="ここに音声文字起こしが入ります"></textarea>
+
+<button onclick="organize()">議事録整理</button>
+
+<div class="result">
+<h3>整理結果</h3>
+<div id="output"></div>
+</div>
+
+<script>
+
+let recognition;
+
+if ('webkitSpeechRecognition' in window) {
+
+recognition = new webkitSpeechRecognition();
+recognition.lang = 'ja-JP';
+recognition.continuous = true;
+
+recognition.onresult = function(event){
+
+let transcript="";
+
+for(let i=0;i<event.results.length;i++){
+transcript += event.results[i][0].transcript;
+}
+
+document.getElementById("memo").value = transcript;
+
+}
+
+}
+
+function startRec(){
+recognition.start();
+}
+
+function stopRec(){
+recognition.stop();
+}
+
+function organize(){
+
+let text=document.getElementById("memo").value;
+
+let lines=text.split("。");
+
+let tasks=[];
+let decisions=[];
+
+lines.forEach(l=>{
+
+if(l.includes("やる")||l.includes("実施")||l.includes("決定")){
+decisions.push(l);
+}
+
+if(l.includes("まで")||l.includes("担当")){
+tasks.push(l);
+}
+
+});
+
+let result=`
+
+<h4>会議内容</h4>
+${text}
+
+<h4>決定事項</h4>
+<ul>${decisions.map(l=>"<li>"+l+"</li>").join("")}</ul>
+
+<h4>タスク候補</h4>
+<ul>${tasks.map(l=>"<li>"+l+"</li>").join("")}</ul>
+
+`;
+
+document.getElementById("output").innerHTML=result;
+
+}
+
+</script>
+
+</body>
+</html>
